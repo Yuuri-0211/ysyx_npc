@@ -1,7 +1,7 @@
 module sCPU(
 	//PC out
 	input  [7:0] data_load,
-	input  wen,clk,rst,
+	input  pc_load,clk,rst,hand_rst,
 	output [7:0] seg1_high,
 	output [7:0] seg1_low,
 
@@ -13,18 +13,16 @@ module sCPU(
 	output [7:0] seg3_high,
 	output [7:0] seg3_low,
 	output [7:0] seg4_high,
-	output [7:0] seg4_low,
-	output [1:0] raddr1,
-	output [1:0] raddr2
+	output [7:0] seg4_low
 );						
 
 	//pc	
 	reg [7:0] reg_pc;
 	PC #(.W(8)) u_PC(
 		.write_data(data_load),
-		.wen(wen),
+		.pc_load(pc_load),
 		.clk(clk),
-		.rst(rst),
+		.rst(rst|hand_rst),
 		.out(reg_pc)
 		);
 	seg u_seg1(
@@ -48,18 +46,20 @@ module sCPU(
 	);
 	//rom
 	//reg_files
+	reg [1:0]raddr1=2'b00;
+	reg [1:0]raddr2=2'b01;
 	reg [7:0]rdata1_out;
 	reg [7:0]rdata2_out;
 	reg_files #(.AD_W(2),
 							.DA_W(8)) u_reg_files(
 							.clk(clk),
-							.rst(rst),
-							.wen(reg_rom[7]|reg_rom[6]),
+							.rst(rst|hand_rst),
+							.rf_en(reg_rom[7]|reg_rom[6]),
 							.wdata_in({{4'b0000},reg_rom[3:0]}),
 							.waddr(reg_rom[5:4]),
-							.raddr1(2'b00),
+							.raddr1(raddr1),
 							.rdata1_out(rdata1_out),
-							.raddr2(2'b01),
+							.raddr2(raddr2),
 							.rdata2_out(rdata2_out)
 							);
 	seg u_seg3(

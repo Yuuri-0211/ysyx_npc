@@ -1,6 +1,6 @@
 module PC #(parameter W)(
 	input [W-1:0] write_data,
-	input wen,clk,rst,
+	input pc_load,clk,rst,
 	output reg [W-1:0] out
 	);
 wire [W-1:0]reg_in;
@@ -25,7 +25,7 @@ reg clk_count_1s;
 //慢点
 MuxKey #(2,1,W) u_mux(
 	.out(reg_in),
-	.key(wen),
+	.key(pc_load),
 	.lut({1'b0,add_out,
 				1'b1,write_data
 			 })
