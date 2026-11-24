@@ -37,8 +37,10 @@ reg clk_count_1s;
 //慢点
 	//pc	
 	reg [7:0] reg_pc;
+	wire [7:0] w_data_in;
+	assign w_data_in = reg_pc+{{5{reg_rom[5]}},reg_rom[4:2]};
 	PC #(.W(8)) u_PC(
-		.write_data({4'b0000,reg_rom[5:2]}),
+		.write_data(w_data_in),
 		.pc_load(cond_out&opcode_cond),
 		.clk(clk_count_1s),
 		.rst(rst|hand_rst),
@@ -97,13 +99,20 @@ reg clk_count_1s;
 		);
 	//data_bus
 	reg [7:0]data_bus_in;
+	wire[7:0]imm_bus;
+	wire [7:0] imm_data;//直接补齐全补0
+	wire [2:0] shift_s;//直接补齐防止移位后益处，两位不够用的
+	
+	assign imm_data = {{6{1'b0}},reg_rom[1:0]};
+	assign shift_s = {1'b0,reg_rom[3:2]};
+	assign imm_bus = imm_data<<(shift_s<<1);
 	MuxKey#(4,2,8) u_mux_data_bus(
 		.out(data_bus_in),
 		.key(opcode),
 		.lut({
 			2'b00,alu_out,
 			2'b01,8'b0000_0000,
-			2'b10,{{4'b0000},reg_rom[3:0]},
+			2'b10,{imm_bus},
 			2'b11,8'b0000_0000
 			})
 		);
@@ -129,7 +138,7 @@ reg clk_count_1s;
 	//cond
 	reg cond_out;
 	cond u_cond(
-		.mode_cond(3'b010),
+		.mode_cond(3'b011),
 		.data_in(rdata1_out),
 		.cond(cond_out)
 	);
