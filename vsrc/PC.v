@@ -6,22 +6,22 @@ module PC #(parameter W)(
 wire [W-1:0]reg_in;
 wire [W-1:0]add_out;
 //慢点
-reg [31:0]count;
-reg clk_count_1s;
-	always@(posedge clk) begin
-		if(rst) begin
-			count <= 0;
-			clk_count_1s <= 0;
-		end else begin
-			if(count>=5000000) begin
-				count <= 0;
-				clk_count_1s <= 1;
-			end else begin
-				count <= count + 1;
-				clk_count_1s <= 0;
-			end
-		end
-	end
+//reg [31:0]count;
+//reg clk_count_1s;
+//	always@(posedge clk) begin
+//		if(rst) begin
+//			count <= 0;
+//			clk_count_1s <= 0;
+//		end else begin
+//			if(count>=5000000) begin
+//				count <= 0;
+//				clk_count_1s <= 1;
+//			end else begin
+//				count <= count + 1;
+//				clk_count_1s <= 0;
+//			end
+//		end
+//	end
 //慢点
 MuxKey #(2,1,W) u_mux(
 	.out(reg_in),
@@ -42,7 +42,8 @@ add #(.W(W)) u_add(
 Reg #(.WIDTH(W),.RESET_VAL(0)) u_reg(
 	.clk(clk),
 	.rst(rst),
-	.wen(clk_count_1s),//1秒使能放这里还挺有说法的，不然也是默认1
+//  	.wen(clk_count_1s),//1秒使能放这里还挺有说法的，不然也是默认1
+	.wen(1'b1),
 	.din(reg_in),
 	.dout(out)
 	);

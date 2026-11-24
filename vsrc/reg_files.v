@@ -8,9 +8,10 @@ module reg_files#(parameter AD_W=2,
 
 						//异步读取
 						input wire  [AD_W-1:0]raddr1,
-						output wire [DA_W-1:0]rdata1_out,
+						output  [DA_W-1:0]rdata1_out,
 						input wire  [AD_W-1:0]raddr2,
-						output wire [DA_W-1:0]rdata2_out
+						output  [DA_W-1:0]rdata2_out,
+						output  [DA_W-1:0]dbg_reg0
 						);
 	reg [DA_W-1:0]reg_files_mem[0:(1<<AD_W)-1];
 	
@@ -27,6 +28,7 @@ module reg_files#(parameter AD_W=2,
 
 	assign rdata1_out = reg_files_mem[raddr1];
 	assign rdata2_out = reg_files_mem[raddr2];
+	assign dbg_reg0 = reg_files_mem[0];
 
 endmodule
 
